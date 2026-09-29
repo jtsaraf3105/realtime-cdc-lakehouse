@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Silver Delta tables loaded into the warehouse by lakehouse.warehouse.load
+    schema: raw
+    tables:
+      - name: customers
+        description: Current state of each customer (soft deletes flagged)
+      - name: customers_history
+        description: SCD Type 2 history of customers (one row per version)
+      - name: products
+      - name: orders
+      - name: order_items

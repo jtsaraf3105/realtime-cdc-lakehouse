@@ -1,0 +1,187 @@
+{
+  "layer": "silver",
+  "at": "2026-09-29T17:37:56.497879+00:00",
+  "tables": {
+    "customers": {
+      "rows": 734,
+      "success": true,
+      "checks": [
+        {
+          "expectation": "expect_table_row_count_to_be_between",
+          "column": null,
+          "success": true,
+          "unexpected_percent": null,
+          "observed": "734"
+        },
+        {
+          "expectation": "expect_column_values_to_not_be_null",
+          "column": "customer_id",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_values_to_be_unique",
+          "column": "customer_id",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_values_to_not_be_null",
+          "column": "email",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_values_to_be_in_set",
+          "column": "tier",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_max_to_be_between",
+          "column": "_silver_ts",
+          "success": true,
+          "unexpected_percent": null,
+          "observed": "2026-09-29 17:37:21.989954+00:00"
+        }
+      ]
+    },
+    "customers_history": {
+      "rows": 1135,
+      "success": true,
+      "checks": [
+        {
+          "expectation": "expect_column_values_to_not_be_null",
+          "column": "valid_from",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_pair_values_a_to_be_greater_than_b",
+          "column": null,
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        }
+      ]
+    },
+    "products": {
+      "rows": 80,
+      "success": true,
+      "checks": [
+        {
+          "expectation": "expect_table_row_count_to_be_between",
+          "column": null,
+          "success": true,
+          "unexpected_percent": null,
+          "observed": "80"
+        },
+        {
+          "expectation": "expect_column_values_to_be_unique",
+          "column": "product_id",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_values_to_be_between",
+          "column": "price_num",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_values_to_not_be_null",
+          "column": "category",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        }
+      ]
+    },
+    "orders": {
+      "rows": 2217,
+      "success": true,
+      "checks": [
+        {
+          "expectation": "expect_table_row_count_to_be_between",
+          "column": null,
+          "success": true,
+          "unexpected_percent": null,
+          "observed": "2217"
+        },
+        {
+          "expectation": "expect_column_values_to_be_unique",
+          "column": "order_id",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_values_to_not_be_null",
+          "column": "customer_id",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_values_to_be_in_set",
+          "column": "status",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_values_to_be_between",
+          "column": "total_num",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_max_to_be_between",
+          "column": "_silver_ts",
+          "success": true,
+          "unexpected_percent": null,
+          "observed": "2026-09-29 17:37:17.775803+00:00"
+        }
+      ]
+    },
+    "order_items": {
+      "rows": 4407,
+      "success": true,
+      "checks": [
+        {
+          "expectation": "expect_column_values_to_be_unique",
+          "column": "order_item_id",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_values_to_be_between",
+          "column": "quantity",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_values_to_not_be_null",
+          "column": "order_id",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        }
+      ]
+    }
+  },
+  "success": true,
+  "max_unexpected_percent": 0.0,
+  "checks_total": 21,
+  "checks_failed": 0
+}

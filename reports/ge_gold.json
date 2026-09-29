@@ -1,0 +1,90 @@
+{
+  "layer": "gold",
+  "at": "2026-09-29T17:37:58.347768+00:00",
+  "tables": {
+    "fct_orders": {
+      "rows": 2100,
+      "success": true,
+      "checks": [
+        {
+          "expectation": "expect_table_row_count_to_equal",
+          "column": null,
+          "success": true,
+          "unexpected_percent": null,
+          "observed": "2100"
+        },
+        {
+          "expectation": "expect_column_values_to_be_unique",
+          "column": "order_id",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_values_to_be_between",
+          "column": "total_amount",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_values_to_not_be_null",
+          "column": "customer_version_lsn",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        }
+      ]
+    },
+    "dim_customers_current": {
+      "rows": 734,
+      "success": true,
+      "checks": [
+        {
+          "expectation": "expect_column_values_to_be_unique",
+          "column": "customer_id",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        }
+      ]
+    },
+    "dim_products": {
+      "rows": 80,
+      "success": true,
+      "checks": [
+        {
+          "expectation": "expect_column_values_to_be_unique",
+          "column": "product_id",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        }
+      ]
+    },
+    "agg_daily_revenue": {
+      "rows": 6,
+      "success": true,
+      "checks": [
+        {
+          "expectation": "expect_column_values_to_be_between",
+          "column": "revenue",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        },
+        {
+          "expectation": "expect_column_values_to_be_between",
+          "column": "avg_order_value",
+          "success": true,
+          "unexpected_percent": 0.0,
+          "observed": null
+        }
+      ]
+    }
+  },
+  "success": true,
+  "max_unexpected_percent": 0.0,
+  "checks_total": 8,
+  "checks_failed": 0
+}

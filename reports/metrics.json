@@ -1,0 +1,32 @@
+{
+  "latency": {
+    "rate_target": 50.0,
+    "seconds": 180.0,
+    "row_changes": 9000,
+    "achieved_rate": 50.0,
+    "bronze_events_in_window": 9000,
+    "latency_samples": 5459,
+    "p50_s": 17.377336,
+    "p95_s": 27.51011529999999,
+    "max_s": 148.24827,
+    "final_catch_up_s": 16.911752223968506
+  },
+  "evolution": {
+    "column_visible_after_s": 11.070288181304932,
+    "rows_with_weight": 20,
+    "job_restarted": false
+  },
+  "recovery": {
+    "killed_for_s": 15,
+    "time_from_kill_to_consistent_s": 57.31084609031677,
+    "catch_up_after_restart_s": 17.27426838874817,
+    "duplicate_silver_pks": {
+      "customers": 0,
+      "products": 0,
+      "orders": 0,
+      "order_items": 0
+    },
+    "duplicate_bronze_offsets": 0,
+    "silver_equals_postgres": true
+  }
+}

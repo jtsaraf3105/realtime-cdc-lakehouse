@@ -1,0 +1,17 @@
+pyspark==4.2.0
+delta-spark==4.4.0
+deltalake==1.6.6
+duckdb==1.5.6
+dbt-core==1.12.5
+dbt-duckdb==1.11.0
+great_expectations==1.23.2
+pandas>=2.2,<3.0          # PySpark 4.2 doesn't fully support pandas 3 yet
+pyarrow>=17
+psycopg[binary]>=3.2
+requests>=2.32
+pytest>=8
+ruff>=0.5
+sqlfluff==4.3.0
+# optional: WAREHOUSE_TARGET=snowflake
+# snowflake-connector-python[pandas]>=3.12
+# dbt-snowflake>=1.9

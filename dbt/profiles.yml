@@ -1,0 +1,27 @@
+# Targets:
+#   dev        DuckDB file loaded by `python -m lakehouse.warehouse.load` (default)
+#   ci         same, path set by CI (fixtures loaded by tests/fixtures/make_warehouse.py)
+#   snowflake  production target (Snowflake trial works); set SNOWFLAKE_* env vars
+cdc_lakehouse:
+  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('WAREHOUSE_PATH', '../warehouse/lakehouse.duckdb') }}"
+      schema: analytics
+      threads: 4
+    ci:
+      type: duckdb
+      path: "{{ env_var('WAREHOUSE_PATH', '../warehouse/ci.duckdb') }}"
+      schema: analytics
+      threads: 4
+    snowflake:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', '') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', '') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', '') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'TRANSFORMER') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'TRANSFORMING') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'LAKEHOUSE') }}"
+      schema: ANALYTICS
+      threads: 4

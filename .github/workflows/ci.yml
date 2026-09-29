@@ -1,0 +1,27 @@
+name: CI
+on:
+  push: {branches: [main]}
+  pull_request:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12", cache: pip}
+      - run: pip install ruff==0.15.* sqlfluff==4.3.0
+      - run: ruff check . && ruff format --check .
+      - run: sqlfluff lint dbt/models --dialect duckdb --templater jinja
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12", cache: pip}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: "17"}
+      - run: pip install -r requirements.txt
+      # Spark local-mode unit tests of the CDC transforms + dbt build (models and tests) on DuckDB
+      # fixtures exported from a real pipeline run.
+      - run: pytest -q   # setup-java exports JAVA_HOME

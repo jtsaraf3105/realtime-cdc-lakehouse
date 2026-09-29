@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: fct_orders
+    description: One row per (non-purged) order with customer attributes as of order time.
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('stg_customers')", field: customer_id}
+      - name: customer_version_lsn
+        description: SCD2 version valid when the order was placed
+        data_tests: [not_null]
+      - name: status
+        data_tests:
+          - accepted_values:
+              arguments: {values: ["created", "paid", "shipped", "delivered", "cancelled"]}
+      - name: total_amount
+        data_tests: [not_null]
+  - name: dim_customers
+    columns:
+      - name: customer_sk
+        data_tests: [unique, not_null]
+      - name: customer_id
+        data_tests: [not_null]
+  - name: dim_products
+    columns:
+      - name: product_id
+        data_tests: [unique, not_null]
+  - name: agg_daily_revenue
+    columns:
+      - name: order_date
+        data_tests: [not_null]
+      - name: revenue
+        data_tests: [not_null]

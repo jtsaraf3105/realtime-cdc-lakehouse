@@ -1,0 +1,101 @@
+# Streaming infrastructure only (fits a 2 CPU / 4 GB Docker VM: ~2.5 GB total).
+# Spark jobs, dbt, Great Expectations and Airflow run natively from the Python venv (see Makefile).
+#   Postgres  localhost:5462   (shop / shop / shop, wal_level=logical)
+#   Kafka     localhost:29092  (KRaft single node — no ZooKeeper)
+#   Connect   localhost:8083   (Debezium)
+#   S3        localhost:8333   (SeaweedFS S3 API, key lakehouse / lakehouse12345, bucket lakehouse)
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment: {POSTGRES_USER: shop, POSTGRES_PASSWORD: shop, POSTGRES_DB: shop}
+    command: ["postgres", "-c", "wal_level=logical", "-c", "max_wal_senders=4",
+              "-c", "max_replication_slots=4", "-c", "shared_buffers=128MB"]
+    ports: ["5462:5432"]
+    volumes:
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shop -d shop"]
+      interval: 3s
+      retries: 30
+    mem_limit: 384m
+    restart: unless-stopped
+
+  kafka:
+    image: apache/kafka:3.9.0
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:29092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_LOG_RETENTION_HOURS: 72
+      KAFKA_HEAP_OPTS: "-Xmx384m -Xms384m"
+      # Persist the log: without a volume, recreating the container deletes every topic
+      # (including Connect's offset/config topics) — found the hard way, see DECISIONS D16.
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    ports: ["29092:29092"]
+    volumes: [kafkadata:/var/lib/kafka/data]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+      interval: 5s
+      retries: 30
+    mem_limit: 768m
+    restart: unless-stopped
+
+  connect:
+    image: quay.io/debezium/connect:3.0
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      GROUP_ID: cdc-connect
+      CONFIG_STORAGE_TOPIC: _connect_configs
+      OFFSET_STORAGE_TOPIC: _connect_offsets
+      STATUS_STORAGE_TOPIC: _connect_status
+      CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      STATUS_STORAGE_REPLICATION_FACTOR: 1
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      HEAP_OPTS: "-Xmx384m -Xms256m"
+    ports: ["8083:8083"]
+    depends_on:
+      kafka: {condition: service_healthy}
+      postgres: {condition: service_healthy}
+    mem_limit: 768m
+    restart: unless-stopped
+
+  # S3-compatible object store for the Delta lake. (MinIO's community images are no longer
+  # published on Docker Hub/quay, so we use SeaweedFS; any S3 endpoint works.)
+  s3:
+    image: chrislusf/seaweedfs:latest
+    command: ["server", "-ip.bind=0.0.0.0", "-dir=/data", "-s3", "-s3.port=8333", "-s3.config=/etc/seaweedfs/s3.json",
+              "-master.volumeSizeLimitMB=256", "-volume.max=0"]
+    ports: ["8333:8333"]
+    volumes:
+      - ./infra/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+      - s3data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null http://localhost:8333 && curl -fs http://localhost:9333/cluster/status >/dev/null"]
+      interval: 5s
+      retries: 30
+    # 384m was OOM-killed under Delta's many small files during the 50 changes/s benchmark
+    mem_limit: 768m
+    restart: unless-stopped
+
+  s3-init:
+    image: chrislusf/seaweedfs:latest
+    depends_on: {s3: {condition: service_healthy}}
+    entrypoint: ["/bin/sh", "-c", "sleep 3 && echo 's3.bucket.create -name lakehouse' | weed shell -master=s3:9333 && echo bucket ready"]
+    restart: "no"
+
+volumes:
+  pgdata:
+  s3data:
+  kafkadata:
